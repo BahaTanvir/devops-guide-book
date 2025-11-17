@@ -1,0 +1,40 @@
+[book]
+title = "A Guide to DevOps Engineering: Bridging the Gap"
+authors = ["DevOps Community Contributors"]
+language = "en"
+multilingual = false
+src = "src"
+description = "A comprehensive guide for junior DevOps engineers to bridge the gap with senior engineers through scenario-based learning with Sarah, a junior DevOps engineer."
+
+[preprocessor.links]
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/yourusername/devops-guide-book"
+edit-url-template = "https://github.com/yourusername/devops-guide-book/edit/main/{path}"
+site-url = "/devops-guide-book/"
+cname = "devopsguide.dev"
+
+[output.html.fold]
+enable = true
+level = 1
+
+[output.html.playground]
+editable = true
+copyable = true
+line-numbers = true
+
+[output.html.search]
+enable = true
+limit-results = 30
+teaser-word-count = 30
+use-boolean-and = true
+boost-title = 2
+boost-hierarchy = 1
+boost-paragraph = 1
+expand = true
+heading-split-level = 3
+
+[output.html.print]
+enable = true

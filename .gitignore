@@ -1,0 +1,24 @@
+# mdBook output
+book/
+
+# Temporary files
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-*
+
+# Build artifacts
+target/
+Cargo.lock
+
+# Temporary rovodev files
+tmp_rovodev_*
+
+# OS files
+Thumbs.db
+BOOK_OUTLINE.md
