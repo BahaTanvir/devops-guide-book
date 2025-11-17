@@ -4,19 +4,6 @@
 
 ---
 
-## What You'll Learn
-
-Sarah's team is adopting Kubernetes, but the learning curve is steep. By the end of this chapter, you'll know how to:
-
-- Explain core Kubernetes concepts (Pods, Deployments, Services, Namespaces)
-- Understand the Kubernetes control plane and how components interact
-- Write basic Kubernetes manifests for deploying applications
-- Use `kubectl` commands to inspect and manage cluster resources
-- Grasp the relationship between desired state and actual state
-- Navigate Kubernetes documentation and troubleshoot common issues
-
----
-
 ## Sarah's Challenge
 
 *Content coming soon...*

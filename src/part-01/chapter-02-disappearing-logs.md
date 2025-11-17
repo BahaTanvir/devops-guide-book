@@ -4,19 +4,6 @@
 
 ---
 
-## What You'll Learn
-
-Sarah needs to debug an issue, but the logs have vanished. By the end of this chapter, you'll know how to:
-
-- Explain why `kubectl logs` alone is insufficient for debugging production incidents
-- Design a centralized logging pipeline suitable for Kubernetes-based microservices
-- Implement structured, JSON-based logs with correlation IDs
-- Write basic LogQL queries to search and aggregate logs in Loki/Grafana
-- Balance log retention, cost, and compliance considerations
-- Use logs as a signal source for alerts rather than just ad‑hoc debugging
-
----
-
 ## Sarah's Challenge
 
 It was Monday morning, two weeks after the incident with the checkout service. Sarah had just settled into her desk with her coffee when a message popped up in the #platform-team channel:

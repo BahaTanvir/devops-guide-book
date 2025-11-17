@@ -4,19 +4,6 @@
 
 ---
 
-## What You'll Learn
-
-Sarah's first week on-call is a trial by fire—pages at odd hours and stressful decisions. By the end of this chapter, you'll know how to:
-
-- Build sustainable on-call rotations that prevent burnout
-- Create effective runbooks and incident response playbooks
-- Triage incidents quickly and escalate appropriately
-- Use incident management tools (PagerDuty, Opsgenie, etc.) effectively
-- Conduct blameless post-mortems that improve systems and processes
-- Balance on-call responsibilities with project work and personal life
-
----
-
 ## Sarah's Challenge
 
 *Content coming soon...*

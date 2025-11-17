@@ -4,19 +4,6 @@
 
 ---
 
-## What You'll Learn
-
-Sarah's service works perfectly in staging but fails in production—classic environment drift. By the end of this chapter, you'll know how to:
-
-- Identify common sources of environment drift between dev, staging, and production
-- Apply the Twelve‑Factor App config principle in real deployment scenarios
-- Use tools like Kustomize to separate base manifests from environment‑specific overlays
-- Design a configuration audit and validation process that fails fast on missing config
-- Choose appropriate strategies for managing secrets across environments
-- Treat configuration as code with reviewable, repeatable deployments
-
----
-
 ## Sarah's Challenge
 
 Three weeks had passed since Sarah set up the centralized logging system. The team was now able to debug issues much faster with Loki and structured logs. Sarah felt more confident—until Friday afternoon.

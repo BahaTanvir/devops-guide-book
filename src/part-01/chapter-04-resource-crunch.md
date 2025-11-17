@@ -4,19 +4,6 @@
 
 ---
 
-## What You'll Learn
-
-Sarah's service crashes during a traffic spike with mysterious OOMKilled errors. By the end of this chapter, you'll know how to:
-
-- Explain the difference between resource *requests* and *limits* in Kubernetes
-- Interpret OOMKilled events and distinguish them from CPU throttling issues
-- Use Prometheus/metrics‑server data (P50/P95) to rightsize resources
-- Configure Horizontal Pod Autoscalers (HPA) for CPU and memory driven scaling
-- Apply QoS classes, limit ranges, and resource quotas to protect cluster stability
-- Design alerts and dashboards that surface resource problems before outages
-
----
-
 ## Sarah's Challenge
 
 Two weeks after fixing the configuration issues, Sarah was feeling confident. The notification service was running smoothly in production, sending emails and push notifications without issues. Everything seemed perfect.
