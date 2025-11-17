@@ -1,0 +1,43 @@
+# Example: Balanced web service (typical API)
+# Chapter 4: The Resource Crunch
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-api-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-api
+  template:
+    metadata:
+      labels:
+        app: web-api
+    spec:
+      containers:
+      - name: api
+        image: myapp/api-service:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "256Mi"    # Typical usage
+            cpu: "250m"        # 0.25 cores
+          limits:
+            memory: "512Mi"    # 2x for spikes
+            cpu: "500m"        # 2x for bursts
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5    # Account for CPU throttling
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        # Use case: REST APIs, web services, microservices

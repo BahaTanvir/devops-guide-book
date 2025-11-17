@@ -1,0 +1,19 @@
+# Example: Pod with NO resource limits (BAD!)
+# Chapter 4: The Resource Crunch
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: no-limits-bad
+  labels:
+    example: bad-practice
+spec:
+  containers:
+  - name: app
+    image: nginx:latest
+    # ❌ NO resource requests or limits!
+    # This pod can consume unlimited node resources
+    # Can cause:
+    # - Node resource exhaustion
+    # - Impact other pods
+    # - BestEffort QoS (first to be evicted)

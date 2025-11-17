@@ -1,0 +1,24 @@
+# Example: Guaranteed QoS (requests = limits)
+# Chapter 4: The Resource Crunch
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: guaranteed-qos
+  labels:
+    example: guaranteed
+spec:
+  containers:
+  - name: app
+    image: nginx:latest
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "1000m"
+      limits:
+        memory: "1Gi"     # Same as request
+        cpu: "1000m"      # Same as request
+    # Result: Guaranteed QoS class
+    # - Least likely to be evicted
+    # - Use for critical services
+    # - But reserves resources even when not used

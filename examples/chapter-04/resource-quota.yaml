@@ -1,0 +1,46 @@
+# Namespace ResourceQuota and LimitRange
+# Chapter 4: The Resource Crunch
+
+---
+# ResourceQuota: Limits total resources in namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: production-quota
+  namespace: production
+spec:
+  hard:
+    requests.cpu: "50"        # Max 50 CPUs requested across all pods
+    requests.memory: "100Gi"  # Max 100Gi memory requested
+    limits.cpu: "100"         # Max 100 CPUs limit
+    limits.memory: "200Gi"    # Max 200Gi memory limit
+    pods: "100"               # Max 100 pods in namespace
+    services: "50"            # Max 50 services
+    persistentvolumeclaims: "20"  # Max 20 PVCs
+
+---
+# LimitRange: Default and constraints for containers
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: production-limits
+  namespace: production
+spec:
+  limits:
+  - max:  # Maximum per container
+      memory: "4Gi"
+      cpu: "4"
+    min:  # Minimum per container
+      memory: "64Mi"
+      cpu: "50m"
+    default:  # Default limit if not specified
+      memory: "512Mi"
+      cpu: "500m"
+    defaultRequest:  # Default request if not specified
+      memory: "256Mi"
+      cpu: "250m"
+    type: Container
+  - max:  # Maximum per pod
+      memory: "8Gi"
+      cpu: "8"
+    type: Pod

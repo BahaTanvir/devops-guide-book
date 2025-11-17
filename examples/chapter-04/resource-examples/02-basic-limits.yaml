@@ -1,0 +1,21 @@
+# Example: Pod with basic resource limits (GOOD)
+# Chapter 4: The Resource Crunch
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: basic-limits-good
+  labels:
+    example: good-practice
+spec:
+  containers:
+  - name: app
+    image: nginx:latest
+    resources:
+      requests:
+        memory: "256Mi"   # Scheduler uses this
+        cpu: "250m"       # 0.25 CPU cores
+      limits:
+        memory: "512Mi"   # Will be OOMKilled if exceeded
+        cpu: "500m"       # Will be throttled if exceeded
+    # Result: Burstable QoS class

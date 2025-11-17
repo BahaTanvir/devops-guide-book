@@ -1,0 +1,102 @@
+# Prometheus AlertManager rules for resource issues
+# Chapter 4: The Resource Crunch
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-resource-alerts
+  namespace: monitoring
+data:
+  resource-alerts.yaml: |
+    groups:
+    - name: kubernetes_resources
+      interval: 30s
+      rules:
+      
+      # Pod OOMKilled
+      - alert: PodOOMKilled
+        expr: |
+          rate(kube_pod_container_status_terminated_reason{reason="OOMKilled"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} was OOMKilled"
+          description: "Pod exceeded memory limit and was killed by kernel OOM killer"
+      
+      # High memory usage (approaching limit)
+      - alert: PodMemoryUsageHigh
+        expr: |
+          (container_memory_working_set_bytes / container_spec_memory_limit_bytes) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} using >90% of memory limit"
+          description: "Current: {{ $value | humanizePercentage }}. May be OOMKilled soon."
+      
+      # CPU throttling
+      - alert: PodCPUThrottling
+        expr: |
+          rate(container_cpu_cfs_throttled_seconds_total[5m]) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is being CPU throttled"
+          description: "Throttling rate: {{ $value | humanize }}. May cause performance issues."
+      
+      # Pod crash looping
+      - alert: PodCrashLooping
+        expr: |
+          rate(kube_pod_container_status_restarts_total[15m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is crash looping"
+          description: "Pod restarting frequently. Check logs for errors."
+      
+      # Node memory pressure
+      - alert: NodeMemoryPressure
+        expr: |
+          kube_node_status_condition{condition="MemoryPressure",status="true"} == 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Node {{ $labels.node }} under memory pressure"
+          description: "Node may start evicting pods."
+      
+      # Node disk pressure
+      - alert: NodeDiskPressure
+        expr: |
+          kube_node_status_condition{condition="DiskPressure",status="true"} == 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Node {{ $labels.node }} under disk pressure"
+          description: "Node may start evicting pods."
+      
+      # HPA at max replicas
+      - alert: HPAMaxedOut
+        expr: |
+          kube_horizontalpodautoscaler_status_current_replicas >= kube_horizontalpodautoscaler_spec_max_replicas
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler }} at max replicas"
+          description: "Cannot scale further. Consider increasing maxReplicas or optimizing application."
+      
+      # Container resource limits not set
+      - alert: ContainerWithoutLimits
+        expr: |
+          count(kube_pod_container_resource_limits{resource="memory"} == 0) by (namespace, pod, container) > 0
+        for: 1h
+        labels:
+          severity: info
+        annotations:
+          summary: "Container {{ $labels.namespace }}/{{ $labels.pod }}/{{ $labels.container }} has no resource limits"
+          description: "Consider setting resource limits to prevent resource exhaustion."

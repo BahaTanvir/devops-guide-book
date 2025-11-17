@@ -1,0 +1,28 @@
+# Example: Memory-intensive workload (caching, in-memory data)
+# Chapter 4: The Resource Crunch
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memory-intensive-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cache-service
+  template:
+    metadata:
+      labels:
+        app: cache-service
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        resources:
+          requests:
+            memory: "2Gi"      # High memory for cache
+            cpu: "250m"        # Low CPU
+          limits:
+            memory: "4Gi"      # Generous buffer
+            cpu: "500m"
+        # Use case: Redis, Memcached, in-memory databases

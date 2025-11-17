@@ -1,0 +1,28 @@
+# Example: CPU-intensive workload
+# Chapter 4: The Resource Crunch
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-intensive-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cpu-intensive
+  template:
+    metadata:
+      labels:
+        app: cpu-intensive
+    spec:
+      containers:
+      - name: processor
+        image: myapp/data-processor:latest
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "1000m"     # 1 full CPU core
+          limits:
+            memory: "1Gi"
+            cpu: "2000m"     # Can burst to 2 cores
+        # Use case: Data processing, video encoding, ML inference
