@@ -1,0 +1,82 @@
+# Sample application deployment with good logging
+# Chapter 2: The Mystery of the Disappearing Logs
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-app
+  namespace: default
+  labels:
+    app: sample-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sample-app
+  template:
+    metadata:
+      labels:
+        app: sample-app
+    spec:
+      containers:
+      - name: app
+        image: python:3.11-slim
+        command:
+        - sh
+        - -c
+        - |
+          pip install flask >/dev/null 2>&1
+          python /app/sample-app-good-logging.py
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: app-code
+          mountPath: /app
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: app-code
+        configMap:
+          name: sample-app-code
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-app-code
+  namespace: default
+data:
+  sample-app-good-logging.py: |
+    # Content from sample-app-good-logging.py would go here
+    # For actual deployment, build a proper Docker image
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-app
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: sample-app
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: http

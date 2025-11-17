@@ -1,0 +1,20 @@
+# Grafana datasource configuration for Loki
+# Chapter 2: The Mystery of the Disappearing Logs
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: logging
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki:3100
+        isDefault: true
+        editable: true
+        jsonData:
+          maxLines: 1000

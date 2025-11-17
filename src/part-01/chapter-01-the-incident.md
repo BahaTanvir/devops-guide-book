@@ -1004,7 +1004,7 @@ cd devops-guide-book/examples/chapter-01
 cd examples/chapter-01
 ```
 
-See the [Chapter 1 Examples README](../../examples/chapter-01/README.md) for detailed instructions on running these examples in your own environment.
+See the [Chapter 1 Examples README](https://github.com/BahaTanvir/devops-guide-book/tree/main/examples/chapter-01) for detailed instructions on running these examples in your own environment.
 
 **Try it yourself:**
 1. Deploy the broken version and observe the issue
