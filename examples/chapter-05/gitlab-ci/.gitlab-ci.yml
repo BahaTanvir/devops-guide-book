@@ -1,0 +1,114 @@
+# Optimized GitLab CI Pipeline
+# Chapter 5: The Slow Release Nightmare
+
+stages:
+  - lint
+  - test
+  - build
+  - deploy-staging
+  - deploy-production
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
+# Cache npm dependencies
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - .npm/
+
+# Lint job (runs in parallel)
+lint:
+  stage: lint
+  image: node:18-alpine
+  script:
+    - npm ci --cache .npm --prefer-offline
+    - npm run lint
+  only:
+    - merge_requests
+    - main
+
+# Test jobs (parallel execution)
+test:unit:
+  stage: test
+  image: node:18-alpine
+  script:
+    - npm ci --cache .npm --prefer-offline
+    - npm run test:unit
+  coverage: '/Lines\s*:\s*(\d+\.\d+)%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+
+test:integration:
+  stage: test
+  image: node:18-alpine
+  script:
+    - npm ci --cache .npm --prefer-offline
+    - npm run test:integration
+
+test:e2e:
+  stage: test
+  image: node:18-alpine
+  script:
+    - npm ci --cache .npm --prefer-offline
+    - npm run test:e2e
+  allow_failure: true  # E2E can be flaky
+
+# Build Docker image
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    # Use BuildKit for faster builds
+    - export DOCKER_BUILDKIT=1
+    # Build with cache
+    - docker build
+        --cache-from $CI_REGISTRY_IMAGE:latest
+        --tag $IMAGE_TAG
+        --tag $CI_REGISTRY_IMAGE:latest
+        .
+    - docker push $IMAGE_TAG
+    - docker push $CI_REGISTRY_IMAGE:latest
+  only:
+    - main
+
+# Deploy to staging
+deploy:staging:
+  stage: deploy-staging
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl config use-context staging
+    - kubectl set image deployment/myapp myapp=$IMAGE_TAG -n staging
+    - kubectl rollout status deployment/myapp -n staging --timeout=5m
+    - ./scripts/smoke-test.sh staging
+  environment:
+    name: staging
+    url: https://staging.example.com
+  only:
+    - main
+
+# Deploy to production (manual trigger)
+deploy:production:
+  stage: deploy-production
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl config use-context production
+    - kubectl set image deployment/myapp myapp=$IMAGE_TAG -n production
+    - kubectl rollout status deployment/myapp -n production --timeout=10m
+    - ./scripts/smoke-test.sh production
+  environment:
+    name: production
+    url: https://app.example.com
+  when: manual  # Requires manual approval
+  only:
+    - main

@@ -1,0 +1,125 @@
+# FAST GitHub Actions Pipeline (AFTER optimization)
+# Chapter 5: The Slow Release Nightmare
+# Total time: ~12 minutes
+
+name: Fast CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ✅ GOOD: Runs in parallel with tests and build
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node with caching
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - run: npm ci
+      - run: npm run lint
+    # Duration: ~2 minutes
+
+  # ✅ GOOD: Parallel test execution using matrix
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-suite: [unit, integration, e2e]
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node with caching
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - run: npm ci
+      
+      - name: Run ${{ matrix.test-suite }} tests
+        run: npm run test:${{ matrix.test-suite }}
+      
+      - name: Upload coverage
+        if: matrix.test-suite == 'unit'
+        uses: codecov/codecov-action@v3
+    # Duration: ~5 minutes (parallel)
+
+  # ✅ GOOD: Runs in parallel with lint and tests
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Log in to Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # ✅ GOOD: Docker layer caching
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+    # Duration: ~8 minutes (with caching)
+
+  # ✅ GOOD: Only runs after all checks pass
+  deploy-staging:
+    needs: [lint, test, build]
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+      
+      - name: Deploy to staging
+        run: |
+          kubectl set image deployment/myapp \
+            myapp=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -n staging
+          kubectl rollout status deployment/myapp -n staging --timeout=5m
+      
+      - name: Run smoke tests
+        run: ./scripts/smoke-test.sh staging
+    # Duration: ~2 minutes
+
+# Results:
+# - Lint: 2 min (parallel)
+# - Tests: 5 min (parallel, matrix)
+# - Build: 8 min (parallel, cached)
+# - Deploy: 2 min (after checks)
+# Total: max(2, 5, 8) + 2 = 10 minutes!
+# 9x faster than before!

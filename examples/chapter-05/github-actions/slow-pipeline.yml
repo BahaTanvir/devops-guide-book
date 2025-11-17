@@ -1,0 +1,62 @@
+# SLOW GitHub Actions Pipeline (BEFORE optimization)
+# Chapter 5: The Slow Release Nightmare
+# Total time: ~90 minutes
+
+name: Slow CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  # ❌ BAD: Sequential execution
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      # ❌ BAD: No caching
+      - name: Install dependencies
+        run: |
+          npm install          # Downloads 500MB every time!
+          pip install -r requirements.txt
+      
+      - name: Run tests
+        run: npm test         # 15 minutes
+  
+  # ❌ BAD: Waits for test to complete
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      # ❌ BAD: No Docker layer caching
+      - name: Build Docker image
+        run: |
+          docker build -t myapp:${{ github.sha }} .  # 45 minutes!
+      
+      # ❌ BAD: Slow image push
+      - name: Push to registry
+        run: |
+          docker push myapp:${{ github.sha }}        # 20 minutes
+  
+  # ❌ BAD: Waits for build to complete
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/myapp myapp=myapp:${{ github.sha }}
+      
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/myapp  # 10 minutes
+
+# Problems:
+# - Everything runs sequentially
+# - No caching anywhere
+# - Huge Docker image (slow to push/pull)
+# - Inefficient Dockerfile
+# - No parallelization
+# Total: 15 + 45 + 20 + 10 = 90 minutes!
