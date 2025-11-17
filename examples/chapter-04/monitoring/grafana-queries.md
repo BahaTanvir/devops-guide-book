@@ -23,10 +23,12 @@ quantile_over_time(0.95,
 )
 ```
 
-### OOMKill rate
+### OOMKill indicator (example)
 ```promql
 rate(kube_pod_container_status_terminated_reason{reason="OOMKilled"}[5m])
 ```
+
+> **Note:** `kube_pod_container_status_terminated_reason` is a gauge (0/1), so `rate()` on it is more of an illustrative signal than a precise counter. For alerting, use restart counters (e.g., `increase(kube_pod_container_status_restarts_total[5m])`) and treat this more as a dashboard hint.
 
 ## CPU Queries
 

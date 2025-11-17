@@ -1,5 +1,11 @@
 # Prometheus AlertManager rules for resource issues
 # Chapter 4: The Resource Crunch
+#
+# Prerequisites for these alerts to work:
+# - kube-state-metrics deployed in the cluster (for pod/node metrics)
+# - Prometheus scraping kube-state-metrics
+# - cAdvisor metrics available (typically via kubelet, for container metrics)
+# - metrics-server installed (for HPA-related metrics)
 
 apiVersion: v1
 kind: ConfigMap
@@ -16,13 +22,13 @@ data:
       # Pod OOMKilled
       - alert: PodOOMKilled
         expr: |
-          rate(kube_pod_container_status_terminated_reason{reason="OOMKilled"}[5m]) > 0
+          increase(kube_pod_container_status_restarts_total[5m]) > 0
         for: 1m
         labels:
           severity: critical
         annotations:
-          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} was OOMKilled"
-          description: "Pod exceeded memory limit and was killed by kernel OOM killer"
+          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} restarted in the last 5 minutes"
+          description: "One or more containers restarted recently. Check if the cause was OOMKilled using logs or events."
       
       # High memory usage (approaching limit)
       - alert: PodMemoryUsageHigh
@@ -38,13 +44,13 @@ data:
       # CPU throttling
       - alert: PodCPUThrottling
         expr: |
-          rate(container_cpu_cfs_throttled_seconds_total[5m]) > 0.5
+          rate(container_cpu_cfs_throttled_seconds_total[5m]) > 0.1
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is being CPU throttled"
-          description: "Throttling rate: {{ $value | humanize }}. May cause performance issues."
+          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is being CPU throttled (example threshold)"
+          description: "Throttling rate: {{ $value | humanize }}. May cause performance issues. Tune this threshold based on your workload and SLOs."
       
       # Pod crash looping
       - alert: PodCrashLooping

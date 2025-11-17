@@ -1,5 +1,13 @@
 # Canary Deployment Example
 # Stable version handles most traffic, canary gets a small percentage
+#
+# NOTE: This is "simple canary" using pod counts for traffic distribution.
+# With 9 stable pods and 1 canary pod, the Service load balances across all 10 pods,
+# giving approximately 90/10 traffic split.
+#
+# For true weighted routing (e.g., 95% stable, 5% canary regardless of pod count),
+# use a service mesh like Istio, Linkerd, or a progressive delivery tool like Flagger
+# or Argo Rollouts.
 
 ---
 # Stable deployment (90% of traffic)
