@@ -558,6 +558,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: notification-secrets
+  # In real systems you would not commit real secret values; this is for illustration.
 type: Opaque
 stringData:
   smtp-host: "mailhog.staging.svc.cluster.local"
@@ -576,17 +577,14 @@ namespace: staging
 
 resources:
   - ../../base
+  - secrets.yaml
 
 # Patch the base ConfigMap with staging‑specific values
 patchesStrategicMerge:
   - configmap-patch.yaml
 
-# Generate the Secret from a local file (values differ per env)
-secretGenerator:
-  - name: notification-secrets
-    files:
-      - secrets.yaml
-
+# Environment-specific Secret manifest
+# (in real systems you wouldn't commit real secret values)
 # Override replica count for staging
 replicas:
   - name: notification-service
@@ -620,12 +618,14 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: notification-secrets
+  # Do not commit real production secrets to Git. Use this only in a demo environment,
+  # and prefer tools like External Secrets Operator, Sealed Secrets, or Vault in practice.
 type: Opaque
 stringData:
   smtp-host: "smtp.sendgrid.net"
   smtp-port: "587"
   smtp-user: "apikey"
-  smtp-password: "SG.REAL_API_KEY_HERE"  # Real credentials
+  smtp-password: "SG.REAL_API_KEY_HERE"  # Placeholder for real credentials
   push-api-key: "prod-push-api-key-real-12345"
 ```
 
@@ -659,16 +659,13 @@ namespace: production
 
 resources:
   - ../../base
+  - secrets.yaml
 
 patchesStrategicMerge:
   - configmap-patch.yaml
   - resources-patch.yaml
 
-secretGenerator:
-  - name: notification-secrets
-    files:
-      - secrets.yaml
-
+# Environment-specific Secret manifest
 replicas:
   - name: notification-service
     count: 5  # More replicas in production

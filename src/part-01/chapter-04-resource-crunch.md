@@ -687,23 +687,23 @@ groups:
   rules:
   - alert: PodOOMKilled
     expr: |
-      rate(kube_pod_container_status_terminated_reason{reason="OOMKilled"}[5m]) > 0
+      increase(kube_pod_container_status_restarts_total[5m]) > 0
     for: 1m
     labels:
       severity: critical
     annotations:
-      summary: "Pod {{ $labels.pod }} was OOMKilled"
-      description: "Pod exceeded memory limit and was killed"
+      summary: "Pod {{ $labels.pod }} restarted in the last 5 minutes"
+      description: "One or more containers restarted recently. Check if the cause was OOMKilled using logs or events."
 
   - alert: PodCPUThrottling
     expr: |
-      rate(container_cpu_cfs_throttled_seconds_total[5m]) > 0.5
+      rate(container_cpu_cfs_throttled_seconds_total[5m]) > 0.1
     for: 5m
     labels:
       severity: warning
     annotations:
-      summary: "Pod {{ $labels.pod }} is being CPU throttled"
-      description: "CPU throttling may impact performance"
+      summary: "Pod {{ $labels.pod }} is being CPU throttled (example threshold)"
+      description: "CPU throttling may impact performance. Tune this threshold based on your workload and SLOs."
 
   - alert: HighMemoryUsage
     expr: |

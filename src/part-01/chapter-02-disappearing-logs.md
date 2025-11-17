@@ -330,7 +330,9 @@ def get_user(user_id):
 # api-service/app.py
 import logging
 import json
+from datetime import datetime
 from flask import g, request
+import time
 import uuid
 
 # Configure structured logging
@@ -356,6 +358,7 @@ def log_json(level, message, **kwargs):
 def before_request():
     """Generate request ID for correlation"""
     g.request_id = request.headers.get('X-Request-ID', str(uuid.uuid4()))
+    g.start_time = time.time()
     log_json('INFO', 'Request started', 
              method=request.method,
              path=request.path,
@@ -388,9 +391,10 @@ def get_user(user_id):
 @app.after_request
 def after_request(response):
     """Log response"""
+    duration_ms = (time.time() - getattr(g, 'start_time', time.time())) * 1000
     log_json('INFO', 'Request completed',
              status_code=response.status_code,
-             response_time_ms=(time.time() - g.get('start_time', time.time())) * 1000)
+             response_time_ms=duration_ms)
     return response
 ```
 
@@ -403,7 +407,7 @@ def after_request(response):
 
 ### Step 2: Deploy Loki (Deep Dive)
 
-James created the Loki deployment configuration. This section shows a complete example that you can use as a **reference**. For production, always consult the official Loki documentation for your version, storage backend, and retention requirements.
+James created the Loki deployment configuration. This section shows a complete example that you can use as a **reference**, not a drop‑in production manifest. Loki's recommended configuration (especially around log paths and retention) evolves over time, so for production you should always consult the official Loki documentation for your version, storage backend, and retention requirements.
 
 **loki-config.yaml:**
 ```yaml
@@ -524,7 +528,7 @@ spec:
 
 ### Step 3: Deploy Promtail (Log Shipper)
 
-Promtail runs on every node and ships logs to Loki:
+Promtail runs on every node and ships logs to Loki. The example below focuses on the overall structure; consult the Loki/Promtail documentation for the exact `__path__` relabeling needed for your container runtime and log file locations:
 
 **promtail-daemonset.yaml:**
 ```yaml
