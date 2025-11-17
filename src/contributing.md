@@ -235,7 +235,7 @@ brew install mdbook  # macOS
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/devops-guide-book.git
+git clone https://github.com/BahaTanvir/devops-guide-book.git
 cd devops-guide-book
 
 # Serve the book locally

@@ -159,10 +159,11 @@ Questions to help you apply concepts to your situation.
 
 ## Companion Resources
 
-### GitHub Repository
-All code examples, configurations, and scripts are available at:
+### Code Examples Repository
+
+All code examples, configurations, and scripts are available in the GitHub repository:
 ```
-https://github.com/yourusername/devops-guide-book
+https://github.com/BahaTanvir/devops-guide-book
 ```
 
 **Repository structure:**

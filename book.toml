@@ -11,8 +11,8 @@ description = "A comprehensive guide for junior DevOps engineers to bridge the g
 [output.html]
 default-theme = "navy"
 preferred-dark-theme = "navy"
-git-repository-url = "https://github.com/yourusername/devops-guide-book"
-edit-url-template = "https://github.com/yourusername/devops-guide-book/edit/main/{path}"
+git-repository-url = "https://github.com/BahaTanvir/devops-guide-book"
+edit-url-template = "https://github.com/BahaTanvir/devops-guide-book/edit/main/{path}"
 site-url = "/devops-guide-book/"
 cname = "devopsguide.dev"
 

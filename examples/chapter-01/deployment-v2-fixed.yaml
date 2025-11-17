@@ -1,0 +1,66 @@
+# Chapter 1: Fixed deployment (v2.3.0)
+# This is what Sarah should have deployed - with proper configuration and health checks
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-service
+  namespace: production
+  labels:
+    app: checkout-service
+    version: v2.3.0
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: checkout-service
+      version: v2.3.0
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: checkout-service
+        version: v2.3.0
+    spec:
+      containers:
+      - name: checkout
+        image: nginx:1.22-alpine
+        ports:
+        - containerPort: 80
+          name: http
+        env:
+        - name: PORT
+          value: "80"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: checkout-secrets
+              key: database-url
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        # Proper health checks
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3

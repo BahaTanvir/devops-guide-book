@@ -1,0 +1,45 @@
+# Chapter 1: Broken deployment (v2.3.0)
+# This simulates Sarah's incident - missing DATABASE_URL and no health checks
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-service
+  namespace: production
+  labels:
+    app: checkout-service
+    version: v2.3.0-broken
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: checkout-service
+  template:
+    metadata:
+      labels:
+        app: checkout-service
+        version: v2.3.0-broken
+    spec:
+      containers:
+      - name: checkout
+        # Using an image that will crash without DATABASE_URL
+        image: busybox:latest
+        command: 
+        - sh
+        - -c
+        - |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Error: DATABASE_URL environment variable not set"
+            echo "Fatal: Cannot connect to database"
+            echo "Application startup failed"
+            exit 1
+          fi
+          echo "Service running..."
+          while true; do sleep 3600; done
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        # Missing: DATABASE_URL environment variable
+        # Missing: Health checks!

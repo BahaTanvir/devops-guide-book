@@ -24,7 +24,7 @@ This open-source book follows **Sarah**, a junior DevOps engineer, as she naviga
 ## 📖 Read the Book
 
 ### Online
-🌐 **[Read online](https://yourusername.github.io/devops-guide-book/)** (Coming soon)
+🌐 **[Read online](https://bahatanvir.github.io/devops-guide-book/)** (GitHub Pages - coming soon)
 
 ### Local Development
 ```bash
@@ -32,13 +32,17 @@ This open-source book follows **Sarah**, a junior DevOps engineer, as she naviga
 cargo install mdbook
 
 # Clone the repository
-git clone https://github.com/yourusername/devops-guide-book.git
+git clone https://github.com/BahaTanvir/devops-guide-book.git
 cd devops-guide-book
 
 # Serve locally
 mdbook serve
 
 # Open http://localhost:3000 in your browser
+
+# Or build static files
+mdbook build
+# Output will be in book/ directory
 ```
 
 ### Download
@@ -181,10 +185,11 @@ This book is made possible by:
 
 ## 📬 Contact & Community
 
-- **Issues:** [GitHub Issues](https://github.com/yourusername/devops-guide-book/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/yourusername/devops-guide-book/discussions)
-- **Discord:** Coming soon
-- **Twitter:** Coming soon
+- **GitHub:** [BahaTanvir/devops-guide-book](https://github.com/BahaTanvir/devops-guide-book)
+- **Issues:** [Report bugs and suggestions](https://github.com/BahaTanvir/devops-guide-book/issues)
+- **Discussions:** [Ask questions and share ideas](https://github.com/BahaTanvir/devops-guide-book/discussions)
+- **Discord:** Community server coming soon
+- **Twitter:** Follow for updates (coming soon)
 
 ## 🚀 Quick Start
 
@@ -193,13 +198,15 @@ Just visit the website and start reading!
 
 ### Practice Along
 ```bash
-# Clone the repo
-git clone https://github.com/yourusername/devops-guide-book.git
+# Clone the repository
+git clone https://github.com/BahaTanvir/devops-guide-book.git
+cd devops-guide-book
 
-# Navigate to examples
-cd devops-guide-book/examples/chapter-01
+# Navigate to examples directory
+cd examples/chapter-01
 
 # Follow along with the code
+./test.sh
 ```
 
 ### Join the Community

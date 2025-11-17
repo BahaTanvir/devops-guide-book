@@ -1,0 +1,114 @@
+# Canary Deployment Example
+# Stable version handles most traffic, canary gets a small percentage
+
+---
+# Stable deployment (90% of traffic)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-service-stable
+  namespace: production
+  labels:
+    app: checkout-service
+    track: stable
+spec:
+  replicas: 9  # 90% of desired capacity
+  selector:
+    matchLabels:
+      app: checkout-service
+      track: stable
+  template:
+    metadata:
+      labels:
+        app: checkout-service
+        track: stable
+        version: v2.2.0
+    spec:
+      containers:
+      - name: checkout
+        image: nginx:1.21-alpine
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+# Canary deployment (10% of traffic)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-service-canary
+  namespace: production
+  labels:
+    app: checkout-service
+    track: canary
+spec:
+  replicas: 1  # 10% of desired capacity
+  selector:
+    matchLabels:
+      app: checkout-service
+      track: canary
+  template:
+    metadata:
+      labels:
+        app: checkout-service
+        track: canary
+        version: v2.3.0
+    spec:
+      containers:
+      - name: checkout
+        image: nginx:1.22-alpine
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+# Service routes to both stable and canary
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkout-service
+  namespace: production
+spec:
+  type: ClusterIP
+  selector:
+    app: checkout-service  # Matches both stable and canary
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP

@@ -124,13 +124,13 @@ When using or adapting this work, please provide attribution like:
 **For the book:**
 ```
 "A Guide to DevOps Engineering: Bridging the Gap" by DevOps Community Contributors,
-licensed under CC BY-SA 4.0. Available at https://github.com/yourusername/devops-guide-book
+licensed under CC BY-SA 4.0. Available at https://github.com/BahaTanvir/devops-guide-book
 ```
 
 **For code examples:**
 ```
 # Adapted from "A Guide to DevOps Engineering" (MIT License)
-# https://github.com/yourusername/devops-guide-book
+# https://github.com/BahaTanvir/devops-guide-book
 ```
 
 ---

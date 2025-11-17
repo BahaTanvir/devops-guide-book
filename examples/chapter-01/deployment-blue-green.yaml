@@ -1,0 +1,114 @@
+# Blue-Green Deployment Example
+# Two complete deployments running side-by-side
+# Switch traffic by updating the Service selector
+
+---
+# Blue deployment (current production)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-service-blue
+  namespace: production
+  labels:
+    app: checkout-service
+    version: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: checkout-service
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: checkout-service
+        version: blue
+    spec:
+      containers:
+      - name: checkout
+        image: nginx:1.21-alpine  # Old version
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+# Green deployment (new version)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-service-green
+  namespace: production
+  labels:
+    app: checkout-service
+    version: green
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: checkout-service
+      version: green
+  template:
+    metadata:
+      labels:
+        app: checkout-service
+        version: green
+    spec:
+      containers:
+      - name: checkout
+        image: nginx:1.22-alpine  # New version
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+# Service - change selector to switch between blue and green
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkout-service
+  namespace: production
+spec:
+  type: ClusterIP
+  selector:
+    app: checkout-service
+    version: blue  # Change to 'green' to switch traffic
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP

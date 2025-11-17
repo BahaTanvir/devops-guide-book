@@ -1,0 +1,20 @@
+# Service for checkout-service
+# Routes traffic to pods with app=checkout-service label
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkout-service
+  namespace: production
+  labels:
+    app: checkout-service
+spec:
+  type: ClusterIP
+  selector:
+    app: checkout-service
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  sessionAffinity: None
