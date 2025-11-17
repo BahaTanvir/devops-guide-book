@@ -1,0 +1,14 @@
+# Base ConfigMap for notification service
+# Values will be overridden by environment-specific overlays
+# Chapter 3: "It Works on My Machine"
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notification-config
+data:
+  port: "8080"
+  # These will be overridden by environment-specific values
+  redis-url: "OVERRIDE_ME"
+  user-service-url: "OVERRIDE_ME"
+  log-level: "INFO"

@@ -1,0 +1,12 @@
+# Production-specific ConfigMap
+# Chapter 3: "It Works on My Machine"
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notification-config
+data:
+  port: "8080"
+  redis-url: "redis://redis.production.svc.cluster.local:6379"
+  user-service-url: "http://user-service.production.svc.cluster.local"
+  log-level: "INFO"  # Less verbose in production

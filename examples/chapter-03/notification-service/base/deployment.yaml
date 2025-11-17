@@ -1,0 +1,90 @@
+# Base deployment for notification service
+# Chapter 3: "It Works on My Machine"
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+spec:
+  replicas: 2  # Will be overridden per environment
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+      - name: notification
+        image: techflow/notification-service:v1.2.0
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        # Non-sensitive config from ConfigMap
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: notification-config
+              key: port
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: notification-config
+              key: redis-url
+        - name: USER_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: notification-config
+              key: user-service-url
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: notification-config
+              key: log-level
+        # Sensitive config from Secrets
+        - name: SMTP_HOST
+          valueFrom:
+            secretKeyRef:
+              name: notification-secrets
+              key: smtp-host
+        - name: SMTP_PORT
+          valueFrom:
+            secretKeyRef:
+              name: notification-secrets
+              key: smtp-port
+        - name: SMTP_USER
+          valueFrom:
+            secretKeyRef:
+              name: notification-secrets
+              key: smtp-user
+        - name: SMTP_PASS
+          valueFrom:
+            secretKeyRef:
+              name: notification-secrets
+              key: smtp-password
+        - name: PUSH_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: notification-secrets
+              key: push-api-key
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5

@@ -1,0 +1,14 @@
+# Base kustomization for notification service
+# Chapter 3: "It Works on My Machine"
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - configmap.yaml
+
+commonLabels:
+  app: notification-service
+  managed-by: kustomize

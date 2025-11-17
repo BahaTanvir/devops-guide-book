@@ -1,0 +1,12 @@
+# Staging-specific ConfigMap
+# Chapter 3: "It Works on My Machine"
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notification-config
+data:
+  port: "8080"
+  redis-url: "redis://redis.staging.svc.cluster.local:6379"
+  user-service-url: "http://user-service.staging.svc.cluster.local"
+  log-level: "DEBUG"  # More verbose in staging
