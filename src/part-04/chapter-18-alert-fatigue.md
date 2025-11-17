@@ -4,6 +4,19 @@
 
 ---
 
+## What You'll Learn
+
+Sarah's team is drowning in alerts—most are false positives, and real issues get lost. By the end of this chapter, you'll know how to:
+
+- Design alert rules that are actionable, not noisy
+- Implement alert routing, grouping, and de-duplication
+- Use alert severity levels and escalation policies effectively
+- Apply SLO-based alerting to focus on user impact
+- Configure silencing and maintenance windows appropriately
+- Build a culture of alert hygiene and continuous improvement
+
+---
+
 ## Sarah's Challenge
 
 *Content coming soon...*

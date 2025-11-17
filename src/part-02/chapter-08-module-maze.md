@@ -4,6 +4,19 @@
 
 ---
 
+## What You'll Learn
+
+Sarah's team created a Terraform module so complex that nobody understands it anymore. By the end of this chapter, you'll know how to:
+
+- Design reusable Terraform modules with clear input/output contracts
+- Balance abstraction and simplicity in module design
+- Version and publish modules for team consumption
+- Use module composition to build larger infrastructure patterns
+- Avoid common module anti-patterns (over-abstraction, hidden dependencies)
+- Test and validate modules before promoting them to production
+
+---
+
 ## Sarah's Challenge
 
 *Content coming soon...*

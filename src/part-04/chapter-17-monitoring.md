@@ -4,6 +4,19 @@
 
 ---
 
+## What You'll Learn
+
+Sarah's team is flying blind—incidents happen, but there's no visibility into what's wrong. By the end of this chapter, you'll know how to:
+
+- Design a comprehensive monitoring strategy (metrics, logs, traces)
+- Implement Prometheus for metrics collection and Grafana for visualization
+- Choose the right metrics to track (RED, USE, Four Golden Signals)
+- Create effective dashboards that surface problems quickly
+- Use service-level indicators (SLIs) to measure what users care about
+- Avoid vanity metrics and focus on actionable observability
+
+---
+
 ## Sarah's Challenge
 
 *Content coming soon...*

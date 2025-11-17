@@ -4,6 +4,19 @@
 
 ---
 
+## What You'll Learn
+
+Sarah discovers that everyone on the team has cluster-admin privileges—a recipe for disaster. By the end of this chapter, you'll know how to:
+
+- Implement Kubernetes RBAC (Roles, RoleBindings, ClusterRoles, ClusterRoleBindings)
+- Design role hierarchies that balance security and usability
+- Use ServiceAccounts for pod-level access control
+- Integrate with identity providers (OAuth, LDAP, SAML) for authentication
+- Audit access logs to detect and respond to suspicious activity
+- Apply defense-in-depth with pod security policies and admission controllers
+
+---
+
 ## Sarah's Challenge
 
 *Content coming soon...*
