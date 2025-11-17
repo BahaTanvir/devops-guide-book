@@ -133,6 +133,10 @@ Use this book alongside official study guides for practical context.
 
 ## Special Features and How to Use Them
 
+### 🎯 "What You'll Learn" Sections
+Quick lists at the start of each chapter summarizing what you'll be able to do by the end.
+**Use these:** Skim them before reading to focus your attention, and revisit them after reading to check your understanding against the outcomes.
+
 ### 💡 Tip Boxes
 Quick, actionable advice that you can apply immediately.
 **Use these:** Bookmark or copy to your notes for reference.

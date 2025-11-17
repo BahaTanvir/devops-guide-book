@@ -4,6 +4,18 @@
 
 ---
 
+## What You'll Learn
+
+Sarah is about to experience her first production incident. By the end of this chapter, you'll know how to:
+
+- Distinguish between a pod that is merely *running* and a service that is actually *working*
+- Configure effective liveness, readiness, and startup probes in Kubernetes
+- Choose between common deployment strategies (recreate, rolling, blue-green, canary)
+- Perform safe rollbacks using `kubectl rollout`
+- Design deployment checklists and blameless post-mortems that prevent repeat incidents
+
+---
+
 ## Sarah's Challenge
 
 It was a Thursday afternoon, three months into her role at TechFlow, when Sarah experienced her first production incident. She had just finished lunch and was reviewing a pull request when her phone buzzed. Then again. And again.
@@ -382,9 +394,9 @@ strategy:
 - This ensures zero downtime during deployments
 - New pods must pass readiness checks before old pods are terminated
 
-### Deployment Strategies Compared
+### Deep Dive: Deployment Strategies
 
-James explained different deployment strategies and when to use each:
+James explained different deployment strategies and when to use each. If you're new to Kubernetes, treat this section as a reference—focus on understanding that you have options and can roll out changes gradually, rather than memorizing every detail.
 
 #### 1. Recreate Strategy
 ```yaml

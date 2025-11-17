@@ -54,6 +54,7 @@ The book is organized into seven parts:
 7. **Collaboration and Culture** — Communication, on-call, automation decisions, and career growth
 
 Each chapter follows a consistent structure:
+- **What You'll Learn** — A quick overview of what you'll learn in the chapter
 - **Sarah's Challenge** — The scenario and context
 - **Understanding the Problem** — Breaking down the concepts
 - **The Senior's Perspective** — How experienced engineers think about this

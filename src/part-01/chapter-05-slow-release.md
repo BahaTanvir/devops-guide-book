@@ -4,6 +4,19 @@
 
 ---
 
+## What You'll Learn
+
+Sarah's deployment pipeline takes 45 minutes, making hotfixes painfully slow. By the end of this chapter, you'll know how to:
+
+- Identify the critical path in a CI/CD pipeline and spot the true bottlenecks
+- Use caching (dependencies, artifacts, Docker layers) to dramatically reduce build time
+- Restructure pipelines so independent jobs run in parallel instead of sequentially
+- Write production‑grade multi‑stage Dockerfiles that produce small, fast images
+- Design GitHub Actions (or similar) workflows that support fast, safe deployments
+- Introduce smoke tests and staged rollouts to keep feedback fast without sacrificing safety
+
+---
+
 ## Sarah's Challenge
 
 A month had passed since Sarah fixed the resource management issues. The notification service was running smoothly with proper limits and HPA configured. Sarah felt like she was finally getting the hang of DevOps.
@@ -470,7 +483,11 @@ jobs:
       - run: kubectl set image deployment/myapp myapp:$TAG
 ```
 
-**After (12 minutes):**
+**After (≈12 minutes, with optimizations):**
+
+> **Deep Dive: Full GitHub Actions Workflow**
+> Treat this as a reference implementation. Even if you use GitLab CI, Jenkins, or another system, the structure—parallel jobs, caching, staged deploys—still applies.
+
 ```yaml
 name: Optimized CI/CD
 

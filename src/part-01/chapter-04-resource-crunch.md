@@ -4,6 +4,19 @@
 
 ---
 
+## What You'll Learn
+
+Sarah's service crashes during a traffic spike with mysterious OOMKilled errors. By the end of this chapter, you'll know how to:
+
+- Explain the difference between resource *requests* and *limits* in Kubernetes
+- Interpret OOMKilled events and distinguish them from CPU throttling issues
+- Use Prometheus/metrics‑server data (P50/P95) to rightsize resources
+- Configure Horizontal Pod Autoscalers (HPA) for CPU and memory driven scaling
+- Apply QoS classes, limit ranges, and resource quotas to protect cluster stability
+- Design alerts and dashboards that surface resource problems before outages
+
+---
+
 ## Sarah's Challenge
 
 Two weeks after fixing the configuration issues, Sarah was feeling confident. The notification service was running smoothly in production, sending emails and push notifications without issues. Everything seemed perfect.
@@ -555,9 +568,9 @@ spec:
 - CPU limit: 500m → 1000m (allow bursting)
 - Increased timeouts (account for CPU throttling)
 
-### Step 6: Configure Horizontal Pod Autoscaler
+### Step 6: Configure Horizontal Pod Autoscaler (Deep Dive)
 
-To handle traffic spikes, they added autoscaling:
+To handle traffic spikes, they added autoscaling. This example shows a fairly advanced HPA configuration; on a first read, focus on the idea that Kubernetes can scale based on resource usage. You can come back to the exact YAML when you're ready to implement it.
 
 ```yaml
 apiVersion: autoscaling/v2

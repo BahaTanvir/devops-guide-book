@@ -4,6 +4,19 @@
 
 ---
 
+## What You'll Learn
+
+Sarah's service works perfectly in staging but fails in production—classic environment drift. By the end of this chapter, you'll know how to:
+
+- Identify common sources of environment drift between dev, staging, and production
+- Apply the Twelve‑Factor App config principle in real deployment scenarios
+- Use tools like Kustomize to separate base manifests from environment‑specific overlays
+- Design a configuration audit and validation process that fails fast on missing config
+- Choose appropriate strategies for managing secrets across environments
+- Treat configuration as code with reviewable, repeatable deployments
+
+---
+
 ## Sarah's Challenge
 
 Three weeks had passed since Sarah set up the centralized logging system. The team was now able to debug issues much faster with Loki and structured logs. Sarah felt more confident—until Friday afternoon.
@@ -378,8 +391,13 @@ First, they documented what actually varied between environments:
 
 ### Step 2: Create Base Configuration with Kustomize
 
-**Directory Structure:**
-```
+We'll start with a minimal but realistic base that is shared across environments, then layer environment‑specific differences on top.
+
+> **Tip**
+> If you're new to Kustomize, don't worry about memorizing every detail. Focus on the idea that you define a **base** once and then apply **small patches** per environment.
+
+**Directory Structure (Conceptual):**
+```text
 notification-service/
 ├── base/
 │   ├── deployment.yaml
@@ -389,12 +407,12 @@ notification-service/
 └── overlays/
     ├── staging/
     │   ├── kustomization.yaml
-    │   ├── configmap.yaml
+    │   ├── configmap-patch.yaml
     │   └── secrets.yaml
     └── production/
         ├── kustomization.yaml
-        ├── configmap.yaml
-        └── secrets.yaml
+        ├── configmap-patch.yaml
+        └── resources-patch.yaml
 ```
 
 **base/deployment.yaml:**
@@ -518,12 +536,15 @@ commonLabels:
 
 ### Step 3: Create Staging Overlay
 
-**overlays/staging/configmap.yaml:**
+**overlays/staging/configmap-patch.yaml:**
 ```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: notification-config
+  # Kustomize will merge this with the base ConfigMap
+  # based on name+namespace
+
 data:
   port: "8080"
   redis-url: "redis://redis.staging.svc.cluster.local:6379"
@@ -556,21 +577,22 @@ namespace: staging
 resources:
   - ../../base
 
-configMapGenerator:
-  - name: notification-config
-    behavior: replace
-    files:
-      - configmap.yaml
+# Patch the base ConfigMap with staging‑specific values
+patchesStrategicMerge:
+  - configmap-patch.yaml
 
+# Generate the Secret from a local file (values differ per env)
 secretGenerator:
   - name: notification-secrets
     files:
       - secrets.yaml
 
+# Override replica count for staging
 replicas:
   - name: notification-service
     count: 2
 
+# Pin the image tag for this environment
 images:
   - name: techflow/notification-service
     newTag: v1.2.0
@@ -578,12 +600,13 @@ images:
 
 ### Step 4: Create Production Overlay
 
-**overlays/production/configmap.yaml:**
+**overlays/production/configmap-patch.yaml:**
 ```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: notification-config
+
 data:
   port: "8080"
   redis-url: "redis://redis.production.svc.cluster.local:6379"
@@ -606,6 +629,27 @@ stringData:
   push-api-key: "prod-push-api-key-real-12345"
 ```
 
+**overlays/production/resources-patch.yaml:**
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+
+spec:
+  template:
+    spec:
+      containers:
+      - name: notification
+        resources:
+          requests:
+            memory: "512Mi"  # More resources in production
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+```
+
 **overlays/production/kustomization.yaml:**
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -616,11 +660,9 @@ namespace: production
 resources:
   - ../../base
 
-configMapGenerator:
-  - name: notification-config
-    behavior: replace
-    files:
-      - configmap.yaml
+patchesStrategicMerge:
+  - configmap-patch.yaml
+  - resources-patch.yaml
 
 secretGenerator:
   - name: notification-secrets
@@ -631,23 +673,15 @@ replicas:
   - name: notification-service
     count: 5  # More replicas in production
 
-resources:
-  - name: notification-service
-    behavior: merge
-    resources:
-      requests:
-        memory: "512Mi"  # More resources in production
-        cpu: "500m"
-      limits:
-        memory: "1Gi"
-        cpu: "1000m"
-
 images:
   - name: techflow/notification-service
     newTag: v1.2.0
 ```
 
 ### Step 5: Deploy with Kustomize
+
+> **Deep Dive: Validating Kustomize Output**
+> Before applying to a real cluster, always inspect the rendered manifests. This catches mistakes in patches and generators early.
 
 **To Staging:**
 ```bash
@@ -1055,7 +1089,7 @@ Sarah now had proper configuration management in place. She could:
 
 But she was about to face a new challenge: the notification service was running perfectly in production, but during a traffic spike, it started crashing. The logs showed `OOMKilled` errors. Sarah needed to learn about resource management in Kubernetes.
 
-In Chapter 4, "The Resource Crunch," Sarah will learn about CPU and memory limits, how to rightsizing applications, and how to prevent resource-related outages.
+In Chapter 4, "The Resource Crunch," Sarah will learn about CPU and memory limits, how to rightsize applications, and how to prevent resource-related outages.
 
 ---
 
