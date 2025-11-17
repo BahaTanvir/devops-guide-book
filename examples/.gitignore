@@ -1,0 +1,61 @@
+# Terraform
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/*.tfvars
+!**/*.tfvars.example
+
+# Kubernetes
+**/kubeconfig
+**/kubeconfig.yaml
+
+# Secrets and credentials
+**/*.pem
+**/*.key
+**/secrets.yaml
+**/secret-*.yaml
+**/*-secret.yaml
+**/.env
+**/.env.local
+
+# Cloud provider credentials
+**/.aws/
+**/.gcloud/
+**/.azure/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+**/*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+tmp_*
+tmp_rovodev_*
+
+# Build artifacts
+**/dist/
+**/build/
+**/target/
+
+# Docker
+**/.docker/
+
+# Helm
+**/charts/*.tgz
+
+# Generated files
+**/generated/
