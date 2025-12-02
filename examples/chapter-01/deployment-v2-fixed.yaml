@@ -28,6 +28,9 @@ spec:
     spec:
       containers:
       - name: checkout
+        # Using nginx for simplicity to demonstrate a working deployment with health checks.
+        # Note: This image doesn't actually use the DATABASE_URL, but we include it
+        # to show how secrets would be mounted in a real application.
         image: nginx:1.22-alpine
         ports:
         - containerPort: 80
